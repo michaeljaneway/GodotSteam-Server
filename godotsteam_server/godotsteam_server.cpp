@@ -1345,19 +1345,19 @@ bool SteamServer::sendP2PPacket(uint64_t remote_steam_id, PackedByteArray data, 
 // AcceptSessionWithUser() should only be called in response to a SteamP2PSessionRequest_t callback SteamP2PSessionRequest_t will be posted if another user tries to send you a message, and you haven't tried to talk to them.
 bool SteamServer::acceptSessionWithUser(uint64_t remote_steam_id) {
 	ERR_FAIL_COND_V_MSG(SteamUGC() == NULL, false, "[STEAM SERVER] Networking Messages class not found when calling: acceptSessionWithUser");
-	return SteamNetworkingMessages()->AcceptSessionWithUser(getIdentityFromSteamID(remote_steam_id));
+	return SteamGameServerNetworkingMessages()->AcceptSessionWithUser(getIdentityFromSteamID(remote_steam_id));
 }
 
 // Call this  when you're done talking to a user on a specific channel. Once all open channels to a user have been closed, the open session to the user will be closed, and any new data from this user will trigger a SteamP2PSessionRequest_t callback.
 bool SteamServer::closeChannelWithUser(uint64_t remote_steam_id, int channel) {
 	ERR_FAIL_COND_V_MSG(SteamUGC() == NULL, false, "[STEAM SERVER] Networking Messages class not found when calling: closeChannelWithUser");
-	return SteamNetworkingMessages()->CloseChannelWithUser(getIdentityFromSteamID(remote_steam_id), channel);
+	return SteamGameServerNetworkingMessages()->CloseChannelWithUser(getIdentityFromSteamID(remote_steam_id), channel);
 }
 
 // Call this when you're done talking to a user to immediately free up resources under-the-hood.
 bool SteamServer::closeSessionWithUser(uint64_t remote_steam_id) {
 	ERR_FAIL_COND_V_MSG(SteamUGC() == NULL, false, "[STEAM SERVER] Networking Messages class not found when calling: closeSessionWithUser");
-	return SteamNetworkingMessages()->CloseSessionWithUser(getIdentityFromSteamID(remote_steam_id));
+	return SteamGameServerNetworkingMessages()->CloseSessionWithUser(getIdentityFromSteamID(remote_steam_id));
 }
 
 // Returns information about the latest state of a connection, if any, with the given peer.
@@ -1366,7 +1366,7 @@ Dictionary SteamServer::getSessionConnectionInfo(uint64_t remote_steam_id, bool 
 	ERR_FAIL_COND_V_MSG(SteamUGC() == NULL, connection_info, "[STEAM SERVER] Networking Messages class not found when calling: getSessionConnectionInfo");
 	SteamNetConnectionInfo_t this_info;
 	SteamNetConnectionRealTimeStatus_t this_status;
-	int connection_state = SteamNetworkingMessages()->GetSessionConnectionInfo(getIdentityFromSteamID(remote_steam_id), &this_info, &this_status);
+	int connection_state = SteamGameServerNetworkingMessages()->GetSessionConnectionInfo(getIdentityFromSteamID(remote_steam_id), &this_info, &this_status);
 	// Parse the data to a dictionary
 	connection_info["connection_state"] = connection_state;
 
@@ -1411,7 +1411,7 @@ Array SteamServer::receiveMessagesOnChannel(int channel, int max_messages) {
 	// Allocate the space for the messages
 	SteamNetworkingMessage_t **channel_messages = new SteamNetworkingMessage_t *[max_messages];
 	// Get the messages
-	int available_messages = SteamNetworkingMessages()->ReceiveMessagesOnChannel(channel, channel_messages, max_messages);
+	int available_messages = SteamGameServerNetworkingMessages()->ReceiveMessagesOnChannel(channel, channel_messages, max_messages);
 
 	// Loop through and create the messages as dictionaries then add to the messages array
 	for (int i = 0; i < available_messages; i++) {
@@ -1447,7 +1447,7 @@ Array SteamServer::receiveMessagesOnChannel(int channel, int max_messages) {
 // Sends a message to the specified host. If we don't already have a session with that user, a session is implicitly created. There might be some handshaking that needs to happen before we can actually begin sending message data.
 int SteamServer::sendMessageToUser(uint64_t remote_steam_id, const PackedByteArray data, int flags, int channel) {
 	ERR_FAIL_COND_V_MSG(SteamUGC() == NULL, 0, "[STEAM SERVER] Networking Messages class not found when calling: sendMessageToUser");
-	return SteamNetworkingMessages()->SendMessageToUser(getIdentityFromSteamID(remote_steam_id), data.ptr(), data.size(), flags, channel);
+	return SteamGameServerNetworkingMessages()->SendMessageToUser(getIdentityFromSteamID(remote_steam_id), data.ptr(), data.size(), flags, channel);
 }
 
 
