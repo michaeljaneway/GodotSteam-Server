@@ -1260,38 +1260,38 @@ int32 SteamServer::triggerItemDrop(uint32 definition) {
 
 // This allows the game to specify accept an incoming packet.
 bool SteamServer::acceptP2PSessionWithUser(uint64_t remote_steam_id) {
-	ERR_FAIL_COND_V_MSG(SteamNetworking() == NULL, false, "[STEAM SERVER] Game Server class not found when calling: acceptP2PSessionWithUser");
+	ERR_FAIL_COND_V_MSG(SteamGameServerNetworking() == NULL, false, "[STEAM SERVER] Game Server class not found when calling: acceptP2PSessionWithUser");
 	CSteamID steam_id = createSteamID(remote_steam_id);
-	return SteamNetworking()->AcceptP2PSessionWithUser(steam_id);
+	return SteamGameServerNetworking()->AcceptP2PSessionWithUser(steam_id);
 }
 
 // Allow or disallow P2P connections to fall back to being relayed through the Steam servers if a direct connection or NAT-traversal cannot be established.
 bool SteamServer::allowP2PPacketRelay(bool allow) {
-	ERR_FAIL_COND_V_MSG(SteamNetworking() == NULL, false, "[STEAM SERVER] Game Server class not found when calling: allowP2PPacketRelay");
-	return SteamNetworking()->AllowP2PPacketRelay(allow);
+	ERR_FAIL_COND_V_MSG(SteamGameServerNetworking() == NULL, false, "[STEAM SERVER] Game Server class not found when calling: allowP2PPacketRelay");
+	return SteamGameServerNetworking()->AllowP2PPacketRelay(allow);
 }
 
 // Closes a P2P channel when you're done talking to a user on the specific channel.
 bool SteamServer::closeP2PChannelWithUser(uint64_t remote_steam_id, int channel) {
-	ERR_FAIL_COND_V_MSG(SteamNetworking() == NULL, false, "[STEAM SERVER] Game Server class not found when calling: closeP2PChannelWithUser");
+	ERR_FAIL_COND_V_MSG(SteamGameServerNetworking() == NULL, false, "[STEAM SERVER] Game Server class not found when calling: closeP2PChannelWithUser");
 	CSteamID steam_id = createSteamID(remote_steam_id);
-	return SteamNetworking()->CloseP2PChannelWithUser(steam_id, channel);
+	return SteamGameServerNetworking()->CloseP2PChannelWithUser(steam_id, channel);
 }
 
 // This should be called when you're done communicating with a user, as this will free up all of the resources allocated for the connection under-the-hood.
 bool SteamServer::closeP2PSessionWithUser(uint64_t remote_steam_id) {
-	ERR_FAIL_COND_V_MSG(SteamNetworking() == NULL, false, "[STEAM SERVER] Game Server class not found when calling: closeP2PSessionWithUser");
+	ERR_FAIL_COND_V_MSG(SteamGameServerNetworking() == NULL, false, "[STEAM SERVER] Game Server class not found when calling: closeP2PSessionWithUser");
 	CSteamID steam_id = createSteamID(remote_steam_id);
-	return SteamNetworking()->CloseP2PSessionWithUser(steam_id);
+	return SteamGameServerNetworking()->CloseP2PSessionWithUser(steam_id);
 }
 
 // Fills out a P2PSessionState_t structure with details about the connection like whether or not there is an active connection.
 Dictionary SteamServer::getP2PSessionState(uint64_t remote_steam_id) {
 	Dictionary result;
-	ERR_FAIL_COND_V_MSG(SteamNetworking() == NULL, result, "[STEAM SERVER] Game Server class not found when calling: getP2PSessionState");
+	ERR_FAIL_COND_V_MSG(SteamGameServerNetworking() == NULL, result, "[STEAM SERVER] Game Server class not found when calling: getP2PSessionState");
 	CSteamID steam_id = createSteamID(remote_steam_id);
 	P2PSessionState_t p2pSessionState;
-	if (SteamNetworking()->GetP2PSessionState(steam_id, &p2pSessionState)) {
+	if (SteamGameServerNetworking()->GetP2PSessionState(steam_id, &p2pSessionState)) {
 		result["connection_active"] = p2pSessionState.m_bConnectionActive; // true if we've got an active open connection
 		result["connecting"] = p2pSessionState.m_bConnecting; // true if we're currently trying to establish a connection
 		result["session_error"] = p2pSessionState.m_eP2PSessionError; // last error recorded (see enum in isteamnetworking.h)
@@ -1306,21 +1306,21 @@ Dictionary SteamServer::getP2PSessionState(uint64_t remote_steam_id) {
 
 // Calls IsP2PPacketAvailable() under the hood, returns the size of the available packet or zero if there is no such packet.
 uint32_t SteamServer::getAvailableP2PPacketSize(int channel) {
-	ERR_FAIL_COND_V_MSG(SteamNetworking() == NULL, 0, "[STEAM SERVER] Game Server class not found when calling: getAvailableP2PPacketSize");
+	ERR_FAIL_COND_V_MSG(SteamGameServerNetworking() == NULL, 0, "[STEAM SERVER] Game Server class not found when calling: getAvailableP2PPacketSize");
 	uint32_t message_size = 0;
-	return (SteamNetworking()->IsP2PPacketAvailable(&message_size, channel)) ? message_size : 0;
+	return (SteamGameServerNetworking()->IsP2PPacketAvailable(&message_size, channel)) ? message_size : 0;
 }
 
 // Reads in a packet that has been sent from another user via SendP2PPacket.
 Dictionary SteamServer::readP2PPacket(uint32_t packet, int channel) {
 	Dictionary result;
-	ERR_FAIL_COND_V_MSG(SteamNetworking() == NULL, result, "[STEAM SERVER] Game Server class not found when calling: readP2PPacket");
+	ERR_FAIL_COND_V_MSG(SteamGameServerNetworking() == NULL, result, "[STEAM SERVER] Game Server class not found when calling: readP2PPacket");
 	PackedByteArray data;
 	data.resize(packet);
 	CSteamID steam_id;
 	uint32_t bytes_read = 0;
 
-	if (SteamNetworking()->ReadP2PPacket(data.ptrw(), packet, &bytes_read, &steam_id, channel)) {
+	if (SteamGameServerNetworking()->ReadP2PPacket(data.ptrw(), packet, &bytes_read, &steam_id, channel)) {
 		data.resize(bytes_read);
 		uint64_t remote_steam_id = steam_id.ConvertToUint64();
 		result["data"] = data;
@@ -1334,9 +1334,9 @@ Dictionary SteamServer::readP2PPacket(uint32_t packet, int channel) {
 
 // Sends a P2P packet to the specified user.
 bool SteamServer::sendP2PPacket(uint64_t remote_steam_id, PackedByteArray data, P2PSend send_type, int channel) {
-	ERR_FAIL_COND_V_MSG(SteamNetworking() == NULL, false, "[STEAM SERVER] Game Server class not found when calling: sendP2PPacket");
+	ERR_FAIL_COND_V_MSG(SteamGameServerNetworking() == NULL, false, "[STEAM SERVER] Game Server class not found when calling: sendP2PPacket");
 	CSteamID steam_id = createSteamID(remote_steam_id);
-	return SteamNetworking()->SendP2PPacket(steam_id, data.ptr(), data.size(), EP2PSend(send_type), channel);
+	return SteamGameServerNetworking()->SendP2PPacket(steam_id, data.ptr(), data.size(), EP2PSend(send_type), channel);
 }
 
 
