@@ -849,8 +849,8 @@ bool SteamServer::setHTTPRequestUserAgentInfo(uint32 request_handle, const Strin
 // Grant a specific one-time promotional item to the current user.
 int32 SteamServer::addPromoItem(uint32 item) {
 	int32 new_inventory_handle = 0;
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: addPromoItem");
-	if (SteamInventory()->AddPromoItem(&new_inventory_handle, item)) {
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: addPromoItem");
+	if (SteamGameServerInventory()->AddPromoItem(&new_inventory_handle, item)) {
 		inventory_handle = new_inventory_handle;
 	}
 	return new_inventory_handle;
@@ -859,13 +859,13 @@ int32 SteamServer::addPromoItem(uint32 item) {
 // Grant a specific one-time promotional items to the current user.
 int32 SteamServer::addPromoItems(PackedInt64Array items) {
 	int32 new_inventory_handle = 0;
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: addPromoItems");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: addPromoItems");
 	int count = items.size();
 	SteamItemDef_t *new_items = new SteamItemDef_t[items.size()];
 	for(int i = 0; i < count; i++) {
 		new_items[i] = items[i];
 	}
-	if (SteamInventory()->AddPromoItems(&new_inventory_handle, new_items, count)) {
+	if (SteamGameServerInventory()->AddPromoItems(&new_inventory_handle, new_items, count)) {
 		inventory_handle = new_inventory_handle;
 	}
 	delete[] new_items;
@@ -874,20 +874,20 @@ int32 SteamServer::addPromoItems(PackedInt64Array items) {
 
 // Checks whether an inventory result handle belongs to the specified Steam ID.
 bool SteamServer::checkResultSteamID(uint64_t steam_id_expected, int32 this_inventory_handle) {
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, false, "[STEAM SERVER] Inventory class not found when calling: checkResultSteamID");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, false, "[STEAM SERVER] Inventory class not found when calling: checkResultSteamID");
 	CSteamID steam_id = (uint64)steam_id_expected;
 	
 	if (this_inventory_handle == 0) {
 		this_inventory_handle = inventory_handle;
 	}
-	return SteamInventory()->CheckResultSteamID((SteamInventoryResult_t)this_inventory_handle, steam_id);
+	return SteamGameServerInventory()->CheckResultSteamID((SteamInventoryResult_t)this_inventory_handle, steam_id);
 }
 
 // Consumes items from a user's inventory. If the quantity of the given item goes to zero, it is permanently removed.
 int32 SteamServer::consumeItem(uint64_t item_consume, uint32 quantity) {
 	int32 new_inventory_handle = 0;
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: consumeItem");
-	if (SteamInventory()->ConsumeItem(&new_inventory_handle, (SteamItemInstanceID_t)item_consume, quantity)) {
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: consumeItem");
+	if (SteamGameServerInventory()->ConsumeItem(&new_inventory_handle, (SteamItemInstanceID_t)item_consume, quantity)) {
 	 	inventory_handle = new_inventory_handle;
 	}
 	return new_inventory_handle;
@@ -896,8 +896,8 @@ int32 SteamServer::consumeItem(uint64_t item_consume, uint32 quantity) {
 // Deserializes a result set and verifies the signature bytes.
 int32 SteamServer::deserializeResult(PackedByteArray buffer) {
 	int32 new_inventory_handle = 0;
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, 0, "[STEAM SERVER] Inventory class not found when calling: deserializeResult");
-	if (SteamInventory()->DeserializeResult(&new_inventory_handle, &buffer, buffer.size(), false)) {
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, 0, "[STEAM SERVER] Inventory class not found when calling: deserializeResult");
+	if (SteamGameServerInventory()->DeserializeResult(&new_inventory_handle, &buffer, buffer.size(), false)) {
 		inventory_handle = new_inventory_handle;
 	}
 	return new_inventory_handle;
@@ -905,17 +905,17 @@ int32 SteamServer::deserializeResult(PackedByteArray buffer) {
 
 // Destroys a result handle and frees all associated memory.
 void SteamServer::destroyResult(int this_inventory_handle) {
-	ERR_FAIL_COND_MSG(SteamInventory() == NULL, "[STEAM SERVER] Inventory class not found when calling: destroyResult");
+	ERR_FAIL_COND_MSG(SteamGameServerInventory() == NULL, "[STEAM SERVER] Inventory class not found when calling: destroyResult");
 	if (this_inventory_handle == 0) {
 		this_inventory_handle = inventory_handle;
 	}	
-	SteamInventory()->DestroyResult((SteamInventoryResult_t)this_inventory_handle);
+	SteamGameServerInventory()->DestroyResult((SteamInventoryResult_t)this_inventory_handle);
 }
 
 //! Grant one item in exchange for a set of other items.
 int32 SteamServer::exchangeItems(const PackedInt64Array output_items, const PackedInt32Array output_quantity, const PackedInt64Array input_items, const PackedInt32Array input_quantity) {
 	int32 new_inventory_handle = 0;
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: exchangeItems");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: exchangeItems");
 	uint32 total_output = output_items.size();
 	SteamItemDef_t *generated_items = new SteamItemDef_t[total_output];
 	for (uint32 i = 0; i < total_output; i++) {
@@ -932,7 +932,7 @@ int32 SteamServer::exchangeItems(const PackedInt64Array output_items, const Pack
 	}
 	const SteamItemInstanceID_t *these_item_ids = input_item_ids;
 
-	if (SteamInventory()->ExchangeItems(&new_inventory_handle, generated_items, quantity_out, total_output, these_item_ids, quantity_in, array_size)) {
+	if (SteamGameServerInventory()->ExchangeItems(&new_inventory_handle, generated_items, quantity_out, total_output, these_item_ids, quantity_in, array_size)) {
 		// Update the internally stored handle
 		inventory_handle = new_inventory_handle;
 	}
@@ -944,7 +944,7 @@ int32 SteamServer::exchangeItems(const PackedInt64Array output_items, const Pack
 // Grants specific items to the current user, for developers only.
 int32 SteamServer::generateItems(const PackedInt64Array items, const PackedInt32Array quantity) {
 	int32 new_inventory_handle = 0;
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: generateItems");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: generateItems");
 	uint32 total_quantity = items.size();
 	SteamItemDef_t *generated_items = new SteamItemDef_t[total_quantity];
 
@@ -953,7 +953,7 @@ int32 SteamServer::generateItems(const PackedInt64Array items, const PackedInt32
 	}
 
 	uint32_t *this_quantity = (uint32*) quantity.ptr();
-	if (SteamInventory()->GenerateItems(&new_inventory_handle, generated_items, this_quantity, items.size())) {
+	if (SteamGameServerInventory()->GenerateItems(&new_inventory_handle, generated_items, this_quantity, items.size())) {
 		inventory_handle = new_inventory_handle;
 	}
 	delete[] generated_items;
@@ -963,8 +963,8 @@ int32 SteamServer::generateItems(const PackedInt64Array items, const PackedInt32
 // Start retrieving all items in the current users inventory.
 int32 SteamServer::getAllItems() {
 	int32 new_inventory_handle = 0;
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: getAllItems");
-	if (SteamInventory()->GetAllItems(&new_inventory_handle)) {
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: getAllItems");
+	if (SteamGameServerInventory()->GetAllItems(&new_inventory_handle)) {
 		inventory_handle = new_inventory_handle;
 	}
 	return new_inventory_handle;
@@ -972,10 +972,10 @@ int32 SteamServer::getAllItems() {
 
 // Gets a string property from the specified item definition.  Gets a property value for a specific item definition.
 String SteamServer::getItemDefinitionProperty(uint32 definition, const String &name) {
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, "", "[STEAM SERVER] Inventory class not found when calling: getItemDefinitionProperty");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, "", "[STEAM SERVER] Inventory class not found when calling: getItemDefinitionProperty");
 	char buffer[STEAM_BUFFER_SIZE];
 	uint32 buffer_size = std::size(buffer);
-	SteamInventory()->GetItemDefinitionProperty(definition, name.utf8().get_data(), buffer, &buffer_size);
+	SteamGameServerInventory()->GetItemDefinitionProperty(definition, name.utf8().get_data(), buffer, &buffer_size);
 	String property = String::utf8(buffer, buffer_size);
 	return property;
 }
@@ -983,10 +983,10 @@ String SteamServer::getItemDefinitionProperty(uint32 definition, const String &n
 // After a successful call to RequestPrices, you can call this method to get the pricing for a specific item definition.
 Dictionary SteamServer::getItemPrice(uint32 definition) {
 	Dictionary prices;
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, prices, "[STEAM SERVER] Inventory class not found when calling: getItemPrice");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, prices, "[STEAM SERVER] Inventory class not found when calling: getItemPrice");
 	uint64 price = 0;
 	uint64 base_price = 0;
-	SteamInventory()->GetItemPrice(definition, &price, &base_price);
+	SteamGameServerInventory()->GetItemPrice(definition, &price, &base_price);
 	prices["price"] = (uint64_t)price;
 	prices["base_price"] = (uint64_t)base_price;
 	return prices;
@@ -995,7 +995,7 @@ Dictionary SteamServer::getItemPrice(uint32 definition) {
 // Gets the state of a subset of the current user's inventory.
 int32 SteamServer::getItemsByID(const PackedInt64Array id_array) {
 	int32 new_inventory_handle = 0;
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: getItemsByID");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: getItemsByID");
 	uint32 array_size = id_array.size();
 	SteamItemInstanceID_t *item_ids = new SteamItemInstanceID_t[array_size];
 
@@ -1004,7 +1004,7 @@ int32 SteamServer::getItemsByID(const PackedInt64Array id_array) {
 	}
 	const SteamItemInstanceID_t *these_item_ids = item_ids;
 
-	if (SteamInventory()->GetItemsByID(&new_inventory_handle, these_item_ids, array_size)) {
+	if (SteamGameServerInventory()->GetItemsByID(&new_inventory_handle, these_item_ids, array_size)) {
 		inventory_handle = new_inventory_handle;
 	}
 	delete[] item_ids;
@@ -1013,14 +1013,14 @@ int32 SteamServer::getItemsByID(const PackedInt64Array id_array) {
 
 // After a successful call to RequestPrices, you can call this method to get all the pricing for applicable item definitions. Use the result of GetNumItemsWithPrices as the the size of the arrays that you pass in.
 Array SteamServer::getItemsWithPrices() {
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, Array(), "[STEAM SERVER] Inventory class not found when calling: getItemsWithPrices");
-	uint32 valid_prices = SteamInventory()->GetNumItemsWithPrices();
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, Array(), "[STEAM SERVER] Inventory class not found when calling: getItemsWithPrices");
+	uint32 valid_prices = SteamGameServerInventory()->GetNumItemsWithPrices();
 	Array price_array;
 	SteamItemDef_t *ids = new SteamItemDef_t[valid_prices];
 	uint64 *prices = new uint64[valid_prices];
 	uint64 *base_prices = new uint64[valid_prices];
 
-	if (SteamInventory()->GetItemsWithPrices(ids, prices, base_prices, valid_prices)) {
+	if (SteamGameServerInventory()->GetItemsWithPrices(ids, prices, base_prices, valid_prices)) {
 		for (uint32 i = 0; i < valid_prices; i++) {
 			Dictionary price_group;
 			price_group["item"] = ids[i];
@@ -1037,7 +1037,7 @@ Array SteamServer::getItemsWithPrices() {
 
 // Gets the dynamic properties from an item in an inventory result set.
 String SteamServer::getResultItemProperty(uint32 index, const String &name, int32 this_inventory_handle) {
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, "", "[STEAM SERVER] Inventory class not found when calling: getResultItemProperty");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, "", "[STEAM SERVER] Inventory class not found when calling: getResultItemProperty");
 	char value[256];
 	uint32 buffer_size = std::size(value);
 
@@ -1046,26 +1046,26 @@ String SteamServer::getResultItemProperty(uint32 index, const String &name, int3
 	}
 
 	if (name.is_empty()) {
-		SteamInventory()->GetResultItemProperty((SteamInventoryResult_t)this_inventory_handle, index, NULL, value, &buffer_size);
+		SteamGameServerInventory()->GetResultItemProperty((SteamInventoryResult_t)this_inventory_handle, index, NULL, value, &buffer_size);
 	}
 	else {
-		SteamInventory()->GetResultItemProperty((SteamInventoryResult_t)this_inventory_handle, index, name.utf8().get_data(), value, &buffer_size);
+		SteamGameServerInventory()->GetResultItemProperty((SteamInventoryResult_t)this_inventory_handle, index, name.utf8().get_data(), value, &buffer_size);
 	}
 	return String::utf8(value, buffer_size);
 }
 
 // Get the items associated with an inventory result handle.
 Array SteamServer::getResultItems(int32 this_inventory_handle) {
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, Array(), "[STEAM SERVER] Inventory class not found when calling: getResultItems");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, Array(), "[STEAM SERVER] Inventory class not found when calling: getResultItems");
 	Array items;
 	uint32 size = 0;
 
-	if (SteamInventory()->GetResultItems((SteamInventoryResult_t)this_inventory_handle, NULL, &size)) {
+	if (SteamGameServerInventory()->GetResultItems((SteamInventoryResult_t)this_inventory_handle, NULL, &size)) {
 		SteamItemDetails_t *item_array = new SteamItemDetails_t[size];
 		if (this_inventory_handle == 0) {
 			this_inventory_handle = inventory_handle;
 		}
-		if (SteamInventory()->GetResultItems((SteamInventoryResult_t)this_inventory_handle, item_array, &size)) {
+		if (SteamGameServerInventory()->GetResultItems((SteamInventoryResult_t)this_inventory_handle, item_array, &size)) {
 			for (uint32 i = 0; i < size; i++) {
 				Dictionary item_info;
 				item_info["item_id"] = (uint64_t)item_array[i].m_itemId;
@@ -1082,27 +1082,27 @@ Array SteamServer::getResultItems(int32 this_inventory_handle) {
 
 // Find out the status of an asynchronous inventory result handle.
 Result SteamServer::getResultStatus(int32 this_inventory_handle) {
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, RESULT_FAIL, "[STEAM SERVER] Inventory class not found when calling: getResultStatus");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, RESULT_FAIL, "[STEAM SERVER] Inventory class not found when calling: getResultStatus");
 	if (this_inventory_handle == 0) {
 		this_inventory_handle = inventory_handle;
 	}
-	return (Result)SteamInventory()->GetResultStatus((SteamInventoryResult_t)this_inventory_handle);
+	return (Result)SteamGameServerInventory()->GetResultStatus((SteamInventoryResult_t)this_inventory_handle);
 }
 
 // Gets the server time at which the result was generated.
 uint32 SteamServer::getResultTimestamp(int32 this_inventory_handle) {
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, 0, "[STEAM SERVER] Inventory class not found when calling: getResultTimestamp");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, 0, "[STEAM SERVER] Inventory class not found when calling: getResultTimestamp");
 	if (this_inventory_handle == 0) {
 		this_inventory_handle = inventory_handle;
 	}
-	return SteamInventory()->GetResultTimestamp((SteamInventoryResult_t)this_inventory_handle);
+	return SteamGameServerInventory()->GetResultTimestamp((SteamInventoryResult_t)this_inventory_handle);
 }
 
 // Grant all potential one-time promotional items to the current user.
 int32 SteamServer::grantPromoItems() {
 	int32 new_inventory_handle = 0;
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: grantPromoItems");
-	if (SteamInventory()->GrantPromoItems(&new_inventory_handle)) {
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: grantPromoItems");
+	if (SteamGameServerInventory()->GrantPromoItems(&new_inventory_handle)) {
 		inventory_handle = new_inventory_handle;
 	}
 	return new_inventory_handle;
@@ -1110,39 +1110,39 @@ int32 SteamServer::grantPromoItems() {
 
 // Triggers an asynchronous load and refresh of item definitions.
 bool SteamServer::loadItemDefinitions() {
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, false, "[STEAM SERVER] Inventory class not found when calling: loadItemDefinitions");
-	return SteamInventory()->LoadItemDefinitions();
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, false, "[STEAM SERVER] Inventory class not found when calling: loadItemDefinitions");
+	return SteamGameServerInventory()->LoadItemDefinitions();
 }
 
 // Removes a dynamic property for the given item.
 bool SteamServer::removeProperty(uint64_t item_id, const String &name, uint64_t this_inventory_update_handle) {
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, false, "[STEAM SERVER] Inventory class not found when calling: removeProperty");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, false, "[STEAM SERVER] Inventory class not found when calling: removeProperty");
 	// If no inventory update handle is passed, use internal one
 	if (this_inventory_update_handle == 0) {
 		this_inventory_update_handle = inventory_update_handle;
 	}
-	return SteamInventory()->RemoveProperty((SteamInventoryUpdateHandle_t)this_inventory_update_handle, (SteamItemInstanceID_t)item_id, name.utf8().get_data());
+	return SteamGameServerInventory()->RemoveProperty((SteamInventoryUpdateHandle_t)this_inventory_update_handle, (SteamItemInstanceID_t)item_id, name.utf8().get_data());
 }
 
 // Request the list of "eligible" promo items that can be manually granted to the given user.
 void SteamServer::requestEligiblePromoItemDefinitionsIDs(uint64_t steam_id) {
-	ERR_FAIL_COND_MSG(SteamInventory() == NULL, "[STEAM SERVER] Inventory class not found when calling: requestEligiblePromoItemDefinitionsIDs");
+	ERR_FAIL_COND_MSG(SteamGameServerInventory() == NULL, "[STEAM SERVER] Inventory class not found when calling: requestEligiblePromoItemDefinitionsIDs");
 	CSteamID user_id = (uint64)steam_id;
-	SteamAPICall_t api_call = SteamInventory()->RequestEligiblePromoItemDefinitionsIDs(user_id);
+	SteamAPICall_t api_call = SteamGameServerInventory()->RequestEligiblePromoItemDefinitionsIDs(user_id);
 	callResultEligiblePromoItemDefIDs.Set(api_call, this, &SteamServer::inventory_eligible_promo_item);
 }
 
 // Request prices for all item definitions that can be purchased in the user's local currency. A SteamInventoryRequestPricesResult_t call result will be returned with the user's local currency code. After that, you can call GetNumItemsWithPrices and GetItemsWithPrices to get prices for all the known item definitions, or GetItemPrice for a specific item definition.
 void SteamServer::requestPrices() {
-	ERR_FAIL_COND_MSG(SteamInventory() == NULL, "[STEAM SERVER] Inventory class not found when calling: requestPrices");
-	SteamAPICall_t api_call = SteamInventory()->RequestPrices();
+	ERR_FAIL_COND_MSG(SteamGameServerInventory() == NULL, "[STEAM SERVER] Inventory class not found when calling: requestPrices");
+	SteamAPICall_t api_call = SteamGameServerInventory()->RequestPrices();
 	callResultRequestPrices.Set(api_call, this, &SteamServer::inventory_request_prices_result);
 }
 
 // Serialized result sets contain a short signature which can't be forged or replayed across different game sessions.
 PackedByteArray SteamServer::serializeResult(int32 this_inventory_handle) {
 	PackedByteArray result_serialized;
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, result_serialized, "[STEAM SERVER] Inventory class not found when calling: serializeResult");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, result_serialized, "[STEAM SERVER] Inventory class not found when calling: serializeResult");
 	if (this_inventory_handle == 0) {
 		this_inventory_handle = inventory_handle;
 	}
@@ -1150,7 +1150,7 @@ PackedByteArray SteamServer::serializeResult(int32 this_inventory_handle) {
 	uint32 buffer_size = STEAM_BUFFER_SIZE;
 	PackedByteArray buffer;
 	buffer.resize(buffer_size);
-	if (SteamInventory()->SerializeResult((SteamInventoryResult_t)this_inventory_handle, buffer.ptrw(), &buffer_size)) {
+	if (SteamGameServerInventory()->SerializeResult((SteamInventoryResult_t)this_inventory_handle, buffer.ptrw(), &buffer_size)) {
 		buffer.resize(buffer_size);
 		result_serialized = buffer;
 	}
@@ -1159,43 +1159,43 @@ PackedByteArray SteamServer::serializeResult(int32 this_inventory_handle) {
 
 // Sets a dynamic property for the given item. Supported value types are boolean.
 bool SteamServer::setPropertyBool(uint64_t item_id, const String &name, bool value, uint64_t this_inventory_update_handle) {
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, false, "[STEAM SERVER] Inventory class not found when calling: setPropertyBool");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, false, "[STEAM SERVER] Inventory class not found when calling: setPropertyBool");
 	if (this_inventory_update_handle == 0) {
 		this_inventory_update_handle = inventory_update_handle;
 	}
-	return SteamInventory()->SetProperty((SteamInventoryUpdateHandle_t)this_inventory_update_handle, (SteamItemInstanceID_t)item_id, name.utf8().get_data(), value);
+	return SteamGameServerInventory()->SetProperty((SteamInventoryUpdateHandle_t)this_inventory_update_handle, (SteamItemInstanceID_t)item_id, name.utf8().get_data(), value);
 }
 
 // Sets a dynamic property for the given item. Supported value types are 32 bit floats.
 bool SteamServer::setPropertyFloat(uint64_t item_id, const String &name, float value, uint64_t this_inventory_update_handle) {
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, false, "[STEAM SERVER] Inventory class not found when calling: setPropertyFloat");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, false, "[STEAM SERVER] Inventory class not found when calling: setPropertyFloat");
 	if (this_inventory_update_handle == 0) {
 		this_inventory_update_handle = inventory_update_handle;
 	}
-	return SteamInventory()->SetProperty((SteamInventoryUpdateHandle_t)this_inventory_update_handle, (SteamItemInstanceID_t)item_id, name.utf8().get_data(), value);
+	return SteamGameServerInventory()->SetProperty((SteamInventoryUpdateHandle_t)this_inventory_update_handle, (SteamItemInstanceID_t)item_id, name.utf8().get_data(), value);
 }
 
 // Sets a dynamic property for the given item. Supported value types are 64 bit integers.
 bool SteamServer::setPropertyInt(uint64_t item_id, const String &name, uint64_t value, uint64_t this_inventory_update_handle) {
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, false, "[STEAM SERVER] Inventory class not found when calling: setPropertyInt");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, false, "[STEAM SERVER] Inventory class not found when calling: setPropertyInt");
 	if (this_inventory_update_handle == 0) {
 		this_inventory_update_handle = inventory_update_handle;
 	}
-	return SteamInventory()->SetProperty((SteamInventoryUpdateHandle_t)this_inventory_update_handle, (SteamItemInstanceID_t)item_id, name.utf8().get_data(), (int64)value);
+	return SteamGameServerInventory()->SetProperty((SteamInventoryUpdateHandle_t)this_inventory_update_handle, (SteamItemInstanceID_t)item_id, name.utf8().get_data(), (int64)value);
 }
 
 // Sets a dynamic property for the given item. Supported value types are strings.
 bool SteamServer::setPropertyString(uint64_t item_id, const String &name, const String &value, uint64_t this_inventory_update_handle) {
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, false, "[STEAM SERVER] Inventory class not found when calling: setPropertyString");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, false, "[STEAM SERVER] Inventory class not found when calling: setPropertyString");
 	if (this_inventory_update_handle == 0) {
 		this_inventory_update_handle = inventory_update_handle;
 	}
-	return SteamInventory()->SetProperty((SteamInventoryUpdateHandle_t)this_inventory_update_handle, (SteamItemInstanceID_t)item_id, name.utf8().get_data(), value.utf8().get_data());
+	return SteamGameServerInventory()->SetProperty((SteamInventoryUpdateHandle_t)this_inventory_update_handle, (SteamItemInstanceID_t)item_id, name.utf8().get_data(), value.utf8().get_data());
 }
 
 // Starts the purchase process for the user, given a "shopping cart" of item definitions that the user would like to buy. The user will be prompted in the Steam Overlay to complete the purchase in their local currency, funding their Steam Wallet if necessary, etc.
 void SteamServer::startPurchase(const PackedInt64Array items, const PackedInt32Array quantity) {
-	ERR_FAIL_COND_MSG(SteamInventory() == NULL, "[STEAM SERVER] Inventory class not found when calling: startPurchase");
+	ERR_FAIL_COND_MSG(SteamGameServerInventory() == NULL, "[STEAM SERVER] Inventory class not found when calling: startPurchase");
 	uint32 total_items = items.size();
 	SteamItemDef_t *purchases = new SteamItemDef_t[total_items];
 	for (uint32 i = 0; i < total_items; i++) {
@@ -1203,26 +1203,26 @@ void SteamServer::startPurchase(const PackedInt64Array items, const PackedInt32A
 	}
 
 	uint32_t *these_quantities = (uint32*) quantity.ptr();
-	SteamAPICall_t api_call = SteamInventory()->StartPurchase(purchases, these_quantities, total_items);
+	SteamAPICall_t api_call = SteamGameServerInventory()->StartPurchase(purchases, these_quantities, total_items);
 	callResultStartPurchase.Set(api_call, this, &SteamServer::inventory_start_purchase_result);
 	delete[] purchases;
 }
 
 // Starts a transaction request to update dynamic properties on items for the current user. This call is rate-limited by user, so property modifications should be batched as much as possible (e.g. at the end of a map or game session). After calling SetProperty or RemoveProperty for all the items that you want to modify, you will need to call SubmitUpdateProperties to send the request to the Steam servers. A SteamInventoryResultReady_t callback will be fired with the results of the operation.
 void SteamServer::startUpdateProperties() {
-	ERR_FAIL_COND_MSG(SteamInventory() == NULL, "[STEAM SERVER] Inventory class not found when calling: startUpdateProperties");
-	inventory_update_handle = SteamInventory()->StartUpdateProperties();
+	ERR_FAIL_COND_MSG(SteamGameServerInventory() == NULL, "[STEAM SERVER] Inventory class not found when calling: startUpdateProperties");
+	inventory_update_handle = SteamGameServerInventory()->StartUpdateProperties();
 }
 
 // Submits the transaction request to modify dynamic properties on items for the current user. See StartUpdateProperties.
 int32 SteamServer::submitUpdateProperties(uint64_t this_inventory_update_handle) {
 	int32 new_inventory_handle = 0;
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: submitUpdateProperties");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: submitUpdateProperties");
 	if (this_inventory_update_handle == 0) {
 		this_inventory_update_handle = inventory_update_handle;
 	}
 
-	if (SteamInventory()->SubmitUpdateProperties((SteamInventoryUpdateHandle_t)this_inventory_update_handle, &new_inventory_handle)) {
+	if (SteamGameServerInventory()->SubmitUpdateProperties((SteamInventoryUpdateHandle_t)this_inventory_update_handle, &new_inventory_handle)) {
 		inventory_handle = new_inventory_handle;
 	}
 	return new_inventory_handle;
@@ -1231,14 +1231,14 @@ int32 SteamServer::submitUpdateProperties(uint64_t this_inventory_update_handle)
 // Transfer items between stacks within a user's inventory.
 int32 SteamServer::transferItemQuantity(uint64_t item_id, uint32 quantity, uint64_t item_destination, bool split) {
 	int32 new_inventory_handle = 0;
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: transferItemQuantity");
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: transferItemQuantity");
 	if (split) {
-		if (SteamInventory()->TransferItemQuantity(&new_inventory_handle, (SteamItemInstanceID_t)item_id, quantity, k_SteamItemInstanceIDInvalid)) {
+		if (SteamGameServerInventory()->TransferItemQuantity(&new_inventory_handle, (SteamItemInstanceID_t)item_id, quantity, k_SteamItemInstanceIDInvalid)) {
 			inventory_handle = new_inventory_handle;
 		}
 	}
 	else {
-		if (SteamInventory()->TransferItemQuantity(&new_inventory_handle, (SteamItemInstanceID_t)item_id, quantity, (SteamItemInstanceID_t)item_destination)) {
+		if (SteamGameServerInventory()->TransferItemQuantity(&new_inventory_handle, (SteamItemInstanceID_t)item_id, quantity, (SteamItemInstanceID_t)item_destination)) {
 			inventory_handle = new_inventory_handle;
 		}
 	}
@@ -1248,8 +1248,8 @@ int32 SteamServer::transferItemQuantity(uint64_t item_id, uint32 quantity, uint6
 // Trigger an item drop if the user has played a long enough period of time.
 int32 SteamServer::triggerItemDrop(uint32 definition) {
 	int32 new_inventory_handle = 0;
-	ERR_FAIL_COND_V_MSG(SteamInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: triggerItemDrop");
-	if (SteamInventory()->TriggerItemDrop(&new_inventory_handle, (SteamItemDef_t)definition)) {
+	ERR_FAIL_COND_V_MSG(SteamGameServerInventory() == NULL, new_inventory_handle, "[STEAM SERVER] Inventory class not found when calling: triggerItemDrop");
+	if (SteamGameServerInventory()->TriggerItemDrop(&new_inventory_handle, (SteamItemDef_t)definition)) {
 		inventory_handle = new_inventory_handle;
 	}
 	return new_inventory_handle;
@@ -3212,9 +3212,9 @@ void SteamServer::inventory_definition_update(SteamInventoryDefinitionUpdate_t *
 	// Set the array size variable
 	uint32 size = 0;
 	// Get the item defition IDs
-	if (SteamInventory()->GetItemDefinitionIDs(NULL, &size)) {
+	if (SteamGameServerInventory()->GetItemDefinitionIDs(NULL, &size)) {
 		SteamItemDef_t *id_array = new SteamItemDef_t[size];
-		if (SteamInventory()->GetItemDefinitionIDs(id_array, &size)) {
+		if (SteamGameServerInventory()->GetItemDefinitionIDs(id_array, &size)) {
 			// Loop through the temporary array and populate the return array
 			for (uint32 i = 0; i < size; i++) {
 				definitions.append(id_array[i]);
@@ -3411,7 +3411,7 @@ void SteamServer::inventory_eligible_promo_item(SteamInventoryEligiblePromoItemD
 	SteamItemDef_t *id_array = new SteamItemDef_t[eligible];
 	uint32 array_size = (int)eligible;
 
-	if (SteamInventory()->GetEligiblePromoItemDefinitionIDs(steam_id, id_array, &array_size)) {
+	if (SteamGameServerInventory()->GetEligiblePromoItemDefinitionIDs(steam_id, id_array, &array_size)) {
 		for (int i = 0; i < eligible; i++) {
 			definitions.append(id_array[i]);
 		}
