@@ -672,172 +672,172 @@ bool SteamServer::updateUserAvgRateStat(uint64_t steam_id, const String &name, f
 
 // Creates a cookie container to store cookies during the lifetime of the process. This API is just for during process lifetime, after steam restarts no cookies are persisted and you have no way to access the cookie container across repeat executions of your process.
 uint32_t SteamServer::createCookieContainer(bool allow_responses_to_modify) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, 0, "[STEAM SERVER] HTTP class not found when calling: createCookieContainer");
-	return SteamHTTP()->CreateCookieContainer(allow_responses_to_modify);
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, 0, "[STEAM SERVER] HTTP class not found when calling: createCookieContainer");
+	return SteamGameServerHTTP()->CreateCookieContainer(allow_responses_to_modify);
 }
 
 // Initializes a new HTTP request.
 uint32_t SteamServer::createHTTPRequest(HTTPMethod request_method, const String &absolute_url) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, HTTPREQUEST_INVALID_HANDLE, "[STEAM SERVER] HTTP class not found when calling: createCookieContainer");
-	return SteamHTTP()->CreateHTTPRequest((EHTTPMethod)request_method, absolute_url.utf8().get_data());
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, HTTPREQUEST_INVALID_HANDLE, "[STEAM SERVER] HTTP class not found when calling: createCookieContainer");
+	return SteamGameServerHTTP()->CreateHTTPRequest((EHTTPMethod)request_method, absolute_url.utf8().get_data());
 }
 
 // Defers a request which has already been sent by moving it at the back of the queue.
 bool SteamServer::deferHTTPRequest(uint32 request_handle) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: deferHTTPRequest");
-	return SteamHTTP()->DeferHTTPRequest(request_handle);
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: deferHTTPRequest");
+	return SteamGameServerHTTP()->DeferHTTPRequest(request_handle);
 }
 
 // Gets progress on downloading the body for the request.
 float SteamServer::getHTTPDownloadProgressPct(uint32 request_handle) {
 	float percent_one = 0.0;
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, percent_one, "[STEAM SERVER] HTTP class not found when calling: getHTTPDownloadProgressPct");
-	SteamHTTP()->GetHTTPDownloadProgressPct(request_handle, &percent_one);
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, percent_one, "[STEAM SERVER] HTTP class not found when calling: getHTTPDownloadProgressPct");
+	SteamGameServerHTTP()->GetHTTPDownloadProgressPct(request_handle, &percent_one);
 	return percent_one;
 }
 
 // Check if the reason the request failed was because we timed it out (rather than some harder failure).
 bool SteamServer::getHTTPRequestWasTimedOut(uint32 request_handle) {
 	bool was_timed_out = false;
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, was_timed_out, "[STEAM SERVER] HTTP class not found when calling: getHTTPRequestWasTimedOut");
-	SteamHTTP()->GetHTTPRequestWasTimedOut(request_handle, &was_timed_out);
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, was_timed_out, "[STEAM SERVER] HTTP class not found when calling: getHTTPRequestWasTimedOut");
+	SteamGameServerHTTP()->GetHTTPRequestWasTimedOut(request_handle, &was_timed_out);
 	return was_timed_out;
 }
 
 // Gets the body data from an HTTP response.
 PackedByteArray SteamServer::getHTTPResponseBodyData(uint32 request_handle, uint32 buffer_size) {
 	PackedByteArray body_data;
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, body_data, "[STEAM SERVER] HTTP class not found when calling: getHTTPResponseBodyData");
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, body_data, "[STEAM SERVER] HTTP class not found when calling: getHTTPResponseBodyData");
 	body_data.resize(buffer_size);
-	SteamHTTP()->GetHTTPResponseBodyData(request_handle, body_data.ptrw(), buffer_size);
+	SteamGameServerHTTP()->GetHTTPResponseBodyData(request_handle, body_data.ptrw(), buffer_size);
 	return body_data;
 }
 
 // Gets the size of the body data from an HTTP response.
 uint32 SteamServer::getHTTPResponseBodySize(uint32 request_handle) {
 	uint32 body_size = 0;
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, body_size, "[STEAM SERVER] HTTP class not found when calling: getHTTPResponseBodySize");
-	SteamHTTP()->GetHTTPResponseBodySize(request_handle, &body_size);
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, body_size, "[STEAM SERVER] HTTP class not found when calling: getHTTPResponseBodySize");
+	SteamGameServerHTTP()->GetHTTPResponseBodySize(request_handle, &body_size);
 	return body_size;
 }
 
 // Checks if a header is present in an HTTP response and returns its size.
 uint32 SteamServer::getHTTPResponseHeaderSize(uint32 request_handle, const String &header_name) {
 	uint32 response_header_size = 0;
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, response_header_size, "[STEAM SERVER] HTTP class not found when calling: getHTTPResponseHeaderSize");
-	SteamHTTP()->GetHTTPResponseHeaderSize(request_handle, header_name.utf8().get_data(), &response_header_size);
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, response_header_size, "[STEAM SERVER] HTTP class not found when calling: getHTTPResponseHeaderSize");
+	SteamGameServerHTTP()->GetHTTPResponseHeaderSize(request_handle, header_name.utf8().get_data(), &response_header_size);
 	return response_header_size;
 }
 
 // Gets a header value from an HTTP response.
 PackedByteArray SteamServer::getHTTPResponseHeaderValue(uint32 request_handle, const String &header_name, uint32 buffer_size) {
 	PackedByteArray header_data;
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, header_data, "[STEAM SERVER] HTTP class not found when calling: getHTTPResponseHeaderValue");
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, header_data, "[STEAM SERVER] HTTP class not found when calling: getHTTPResponseHeaderValue");
 	header_data.resize(buffer_size);
-	SteamHTTP()->GetHTTPResponseHeaderValue(request_handle, header_name.utf8().get_data(), header_data.ptrw(), buffer_size);
+	SteamGameServerHTTP()->GetHTTPResponseHeaderValue(request_handle, header_name.utf8().get_data(), header_data.ptrw(), buffer_size);
 	return header_data;
 }
 
 // Gets the body data from a streaming HTTP response.
 PackedByteArray SteamServer::getHTTPStreamingResponseBodyData(uint32 request_handle, uint32 offset, uint32 buffer_size) {
 	PackedByteArray body_data;
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, body_data, "[STEAM SERVER] HTTP class not found when calling: getHTTPStreamingResponseBodyData");
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, body_data, "[STEAM SERVER] HTTP class not found when calling: getHTTPStreamingResponseBodyData");
 	body_data.resize(buffer_size);
-	SteamHTTP()->GetHTTPStreamingResponseBodyData(request_handle, offset, body_data.ptrw(), buffer_size);
+	SteamGameServerHTTP()->GetHTTPStreamingResponseBodyData(request_handle, offset, body_data.ptrw(), buffer_size);
 	return body_data;
 }
 
 // Prioritizes a request which has already been sent by moving it at the front of the queue.
 bool SteamServer::prioritizeHTTPRequest(uint32 request_handle) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: prioritizeHTTPRequest");
-	return SteamHTTP()->PrioritizeHTTPRequest(request_handle);
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: prioritizeHTTPRequest");
+	return SteamGameServerHTTP()->PrioritizeHTTPRequest(request_handle);
 }
 
 // Releases a cookie container, freeing the memory allocated within Steam.
 bool SteamServer::releaseCookieContainer(uint32 cookie_handle) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: releaseCookieContainer");
-	return SteamHTTP()->ReleaseCookieContainer(cookie_handle);
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: releaseCookieContainer");
+	return SteamGameServerHTTP()->ReleaseCookieContainer(cookie_handle);
 }
 
 // Releases an HTTP request handle, freeing the memory allocated within Steam.
 bool SteamServer::releaseHTTPRequest(uint32 request_handle) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: releaseHTTPRequest");
-	return SteamHTTP()->ReleaseHTTPRequest(request_handle);
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: releaseHTTPRequest");
+	return SteamGameServerHTTP()->ReleaseHTTPRequest(request_handle);
 }
 
 // Sends an HTTP request.
 bool SteamServer::sendHTTPRequest(uint32 request_handle) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: sendHTTPRequest");
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: sendHTTPRequest");
 	SteamAPICall_t call_handle;
-	return SteamHTTP()->SendHTTPRequest(request_handle, &call_handle);
+	return SteamGameServerHTTP()->SendHTTPRequest(request_handle, &call_handle);
 }
 
 // Sends an HTTP request and streams the response back in chunks.
 bool SteamServer::sendHTTPRequestAndStreamResponse(uint32 request_handle) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: sendHTTPRequestAndStreamResponse");
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: sendHTTPRequestAndStreamResponse");
 	SteamAPICall_t call_handle;
-	return SteamHTTP()->SendHTTPRequestAndStreamResponse(request_handle, &call_handle);
+	return SteamGameServerHTTP()->SendHTTPRequestAndStreamResponse(request_handle, &call_handle);
 }
 
 // Adds a cookie to the specified cookie container that will be used with future requests.
 bool SteamServer::setHTTPCookie(uint32 cookie_handle, const String &host, const String &url, const String &cookie) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPCookie");
-	return SteamHTTP()->SetCookie(cookie_handle, host.utf8().get_data(), url.utf8().get_data(), cookie.utf8().get_data());
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPCookie");
+	return SteamGameServerHTTP()->SetCookie(cookie_handle, host.utf8().get_data(), url.utf8().get_data(), cookie.utf8().get_data());
 }
 
 // Set an absolute timeout in milliseconds for the HTTP request. This is the total time timeout which is different than the network activity timeout which is set with SetHTTPRequestNetworkActivityTimeout which can bump everytime we get more data.
 bool SteamServer::setHTTPRequestAbsoluteTimeoutMS(uint32 request_handle, uint32 milliseconds) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestAbsoluteTimeoutMS");
-	return SteamHTTP()->SetHTTPRequestAbsoluteTimeoutMS(request_handle, milliseconds);
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestAbsoluteTimeoutMS");
+	return SteamGameServerHTTP()->SetHTTPRequestAbsoluteTimeoutMS(request_handle, milliseconds);
 }
 
 // Set a context value for the request, which will be returned in the HTTPRequestCompleted_t callback after sending the request. This is just so the caller can easily keep track of which callbacks go with which request data. Must be called before sending the request.
 bool SteamServer::setHTTPRequestContextValue(uint32 request_handle, uint64_t context_value) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestContextValue");
-	return SteamHTTP()->SetHTTPRequestContextValue(request_handle, context_value);
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestContextValue");
+	return SteamGameServerHTTP()->SetHTTPRequestContextValue(request_handle, context_value);
 }
 
 // Associates a cookie container to use for an HTTP request.
 bool SteamServer::setHTTPRequestCookieContainer(uint32 request_handle, uint32 cookie_handle) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestCookieContainer");
-	return SteamHTTP()->SetHTTPRequestCookieContainer(request_handle, cookie_handle);
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestCookieContainer");
+	return SteamGameServerHTTP()->SetHTTPRequestCookieContainer(request_handle, cookie_handle);
 }
 
 // Set a GET or POST parameter value on the HTTP request. Must be called prior to sending the request.
 bool SteamServer::setHTTPRequestGetOrPostParameter(uint32 request_handle, const String &name, const String &value) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestGetOrPostParameter");
-	return SteamHTTP()->SetHTTPRequestGetOrPostParameter(request_handle, name.utf8().get_data(), value.utf8().get_data());
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestGetOrPostParameter");
+	return SteamGameServerHTTP()->SetHTTPRequestGetOrPostParameter(request_handle, name.utf8().get_data(), value.utf8().get_data());
 }
 
 // Set a request header value for the HTTP request. Must be called before sending the request.
 bool SteamServer::setHTTPRequestHeaderValue(uint32 request_handle, const String &header_name, const String &header_value) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestHeaderValue");
-	return SteamHTTP()->SetHTTPRequestHeaderValue(request_handle, header_name.utf8().get_data(), header_value.utf8().get_data());
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestHeaderValue");
+	return SteamGameServerHTTP()->SetHTTPRequestHeaderValue(request_handle, header_name.utf8().get_data(), header_value.utf8().get_data());
 }
 
 // Set the timeout in seconds for the HTTP request.
 bool SteamServer::setHTTPRequestNetworkActivityTimeout(uint32 request_handle, uint32 timeout_seconds) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestNetworkActivityTimeout");
-	return SteamHTTP()->SetHTTPRequestNetworkActivityTimeout(request_handle, timeout_seconds);
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestNetworkActivityTimeout");
+	return SteamGameServerHTTP()->SetHTTPRequestNetworkActivityTimeout(request_handle, timeout_seconds);
 }
 
 // Sets the body for an HTTP Post request.
 bool SteamServer::setHTTPRequestRawPostBody(uint32 request_handle, const String &content_type, const String &body) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestRawPostBody");
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestRawPostBody");
 	auto body_utf8 = body.utf8();
-	return SteamHTTP()->SetHTTPRequestRawPostBody(request_handle, content_type.utf8().get_data(), reinterpret_cast<uint8 *>(body_utf8.ptrw()), body_utf8.size());
+	return SteamGameServerHTTP()->SetHTTPRequestRawPostBody(request_handle, content_type.utf8().get_data(), reinterpret_cast<uint8 *>(body_utf8.ptrw()), body_utf8.size());
 }
 
 // Sets that the HTTPS request should require verified SSL certificate via machines certificate trust store. This currently only works Windows and macOS.
 bool SteamServer::setHTTPRequestRequiresVerifiedCertificate(uint32 request_handle, bool require_verified_certificate) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestNetworkActivityTimeout");
-	return SteamHTTP()->SetHTTPRequestRequiresVerifiedCertificate(request_handle, require_verified_certificate);
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestNetworkActivityTimeout");
+	return SteamGameServerHTTP()->SetHTTPRequestRequiresVerifiedCertificate(request_handle, require_verified_certificate);
 }
 
 // Set additional user agent info for a request.
 bool SteamServer::setHTTPRequestUserAgentInfo(uint32 request_handle, const String &user_agent_info) {
-	ERR_FAIL_COND_V_MSG(SteamHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestNetworkActivityTimeout");
-	return SteamHTTP()->SetHTTPRequestUserAgentInfo(request_handle, user_agent_info.utf8().get_data());
+	ERR_FAIL_COND_V_MSG(SteamGameServerHTTP() == NULL, false, "[STEAM SERVER] HTTP class not found when calling: setHTTPRequestNetworkActivityTimeout");
+	return SteamGameServerHTTP()->SetHTTPRequestUserAgentInfo(request_handle, user_agent_info.utf8().get_data());
 }
 
 
